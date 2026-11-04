@@ -7,22 +7,28 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f5f7;
-      --surface: #ffffff;
-      --surface2: #f9fafb;
-      --border: #e0e3ea;
-      --fg: #111827;
-      --fg2: #374151;
-      --fg3: #6b7280;
-      --fg4: #9ca3af;
-      --accent: #1d4ed8;
-      --accent-bg: #eff6ff;
-      --accent-border: #bfdbfe;
-      --green: #15803d;
-      --green-bg: #f0fdf4;
-      --green-border: #bbf7d0;
-      --statusbar: #1e2537;
-      --statusbar-fg: #c9d0e0;
+      /* 공통 바탕 (세 화면 동일) */
+      --bg: #f5f6f8; --surface: #ffffff; --surface2: #f9fafb; --border: #e3e6ec;
+      --fg: #111827; --fg2: #374151; --fg3: #6b7280; --fg4: #9ca3af;
+      --statusbar: #1f2430; --statusbar-fg: #c9d0e0;
+      /* 역할 색 (세 화면 동일): 환자 연두 · 간호사 연보라~분홍 · 의사 파랑 */
+      --patient: #424d63; --patient-strong: #2b354a; --patient-soft: #7d889e;
+      --patient-border: #c9d1e1; --patient-bg: #f0f3fa; --patient-chip: #dfe5f1;
+      --doctor-rgb: 58,101,184; --nurse-rgb: 145,74,140;
+      --patient-rgb: 66,77,99;
+      --nurse: #914a8c; --nurse-strong: #672e63; --nurse-soft: #cc8bc5;
+      --nurse-border: #efcfeb; --nurse-bg: #fdf3fc;
+      --doctor: #3a65b8; --doctor-strong: #254582; --doctor-soft: #7fa4ea;
+      --doctor-border: #c9dcfd; --doctor-bg: #f1f7ff;
+      /* 경고(빨강) · 강조 표시(노랑) */
+      --red: #b91c1c; --red-bg: #fef2f2;
+      --emph: #78350f; --emph-bg: #fde68a;
+      /* 이 화면의 기본 색 = 환자 */
+      --accent: var(--patient); --accent-strong: var(--patient-strong);
+      --accent-bg: var(--patient-bg); --accent-border: var(--patient-border);
+      /* 예전 이름 호환: green = 환자, blue = 의사 */
+      --green: var(--patient); --green-bg: var(--patient-bg); --green-border: var(--patient-border);
+      --blue: var(--doctor); --blue-bg: var(--doctor-bg); --blue-border: var(--doctor-border);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
@@ -295,8 +301,8 @@
     .doctor-msg-text .emph {
       font-size: 1.36em;
       font-weight: 900;
-      color: #1d4ed8;
-      background: #dbeafe;
+      color: var(--emph);
+      background: var(--emph-bg);
       border-radius: 5px;
       padding: 1px 5px;
     }
@@ -358,7 +364,6 @@
       min-height: 46px; padding: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
       background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px;
     }
-    .sb-words.empty::before { content: '수어로 단어를 표현하면 여기에 쌓여요'; font-size: 12px; color: var(--fg4); padding: 0 6px; }
     .sb-chip {
       display: inline-flex; align-items: center; gap: 4px;
       background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green);
@@ -396,6 +401,63 @@
     }
     .num-action.send { background: var(--green); border-color: var(--green); color: #fff; font-size: 16px; }
     .num-action.send:disabled { background: var(--border); border-color: var(--border); color: var(--fg4); cursor: default; }
+
+    /* ===== 색 통일 (공통) ===== */
+    .topnav { border-bottom: 2px solid var(--accent-border); }
+    .status-dot-sm.connected { background: #22c55e; }
+    .staff-meta b.nurse { color: var(--nurse); }
+    .staff-meta b.doctor { color: var(--doctor); }
+    .staff-bubble.nurse { background: var(--nurse-bg); border-color: var(--nurse-border); color: var(--nurse-strong); }
+    .staff-bubble.doctor { background: var(--doctor-bg); border-color: var(--doctor-border); color: var(--doctor-strong); }
+    .patient-msg-time { color: var(--patient); }
+
+    /* 받은 메시지는 보낸 사람 색으로 (의사 파랑 / 간호사 연보라) */
+    .doctor-msg-box { --from: var(--doctor); --from-bg: var(--doctor-bg); --from-border: var(--doctor-border);
+                      background: var(--from-bg); border-color: var(--from-border); }
+    .doctor-msg-box.from-nurse { --from: var(--nurse); --from-bg: var(--nurse-bg); --from-border: var(--nurse-border); }
+    .doctor-msg-label, .doctor-msg-time { color: var(--from); }
+    .recv-sender.doctor { background: var(--doctor-bg); color: var(--doctor); }
+    .recv-sender.nurse  { background: var(--nurse-bg); color: var(--nurse); }
+
+    /* ===== v7: 머리글·라벨을 진하고 크게 ===== */
+    .app-name { font-size: 18px; }
+    .role-tag { font-size: 13px; padding: 4px 11px; }
+    .pi-name { font-size: 17px; }
+    .pi-meta { font-size: 13px; color: var(--fg); }
+    .pi-badge { font-size: 12px; }
+    .pi-key { font-size: 12px; color: var(--fg2); font-weight: 600; }
+    .pi-val { font-size: 14px; color: var(--fg); }
+    .pi-bp-label { font-size: 11px; }
+    .recog-label, .msg-section-label, .gesture-guide-label {
+      font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: 0; text-transform: none;
+    }
+    .gesture-guide-note { font-size: 12px; color: var(--fg2); }
+    .gesture-code { font-size: 15px; }
+    .gesture-pct { font-size: 12px; color: var(--fg2); }
+    .doctor-msg-label { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: 0; text-transform: none; }
+    .doctor-msg-time { font-size: 12px; color: var(--fg2); }
+    .recv-sender { font-size: 12px; }
+    .recv-text { font-size: 16px; color: var(--fg); }
+    .recv-time { font-size: 12px; color: var(--fg3); }
+    .patient-sent-text { font-size: 17px; }
+    .patient-sent-meta { font-size: 12px; color: var(--fg3); }
+    /* 밝은 연두: 단어 칩은 조금 더 진한 연두 바탕 */
+    .sb-chip { background: var(--patient-chip); color: var(--patient-strong); }
+    /* 보낼 문장이 없을 때는 미리보기 칸을 숨김 */
+    .sb-preview.empty { display: none; }
+
+    /* ===== v8: 글씨 조금 키우기 (화면 전체 8% 확대) ===== */
+    html { zoom: 1.08; }
+    /* 새 메시지 도착 시 반짝임 (소리 대신 시각 알림) */
+    @keyframes msgFlash {
+      0%   { box-shadow: 0 0 0 0 rgba(var(--flash-rgb), 0); }
+      15%  { box-shadow: 0 0 0 6px rgba(var(--flash-rgb), 0.45); }
+      100% { box-shadow: 0 0 0 0 rgba(var(--flash-rgb), 0); }
+    }
+    .flash { animation: msgFlash 1.6s ease-out 1; }
+    /* 의료진 메시지: 보낸 사람 색의 왼쪽 굵은 띠 + 도착 시 반짝임 */
+    .doctor-msg-box { border-left: 6px solid var(--from); --flash-rgb: var(--doctor-rgb); }
+    .doctor-msg-box.from-nurse { --flash-rgb: var(--nurse-rgb); }
   </style>
 </head>
 <body>
@@ -484,7 +546,6 @@
     <div class="gesture-guide">
       <div class="gesture-guide-header">
         <span class="gesture-guide-label">수어 인식 순위</span>
-        <span class="gesture-guide-note">신뢰도 높은 순 · 실시간</span>
       </div>
       <div id="gestureRankList"></div>
     </div>
@@ -505,17 +566,16 @@
 
     <!-- 문장 만들기: 수어 단어 + 숫자 -->
     <div class="msg-section">
-      <div class="msg-section-label">문장 만들기 · 수어 단어 + 숫자</div>
       <div class="sb-body">
         <div class="sb-words empty" id="sbWords"></div>
         <div class="num-grid" id="numGrid"></div>
         <div class="num-units" id="numUnits"></div>
         <div class="sb-preview empty" id="sbPreview">
-          <div class="sb-preview-text" id="sbPreviewText">보낼 문장이 여기에 표시돼요</div>
+          <div class="sb-preview-text" id="sbPreviewText"></div>
           <div class="sb-preview-note" id="sbPreviewNote"></div>
         </div>
         <div class="num-actions">
-          <button class="num-action" type="button" id="sbBack">← 지우기</button>
+          <button class="num-action" type="button" id="sbBack">지우기</button>
           <button class="num-action" type="button" id="sbClear">초기화</button>
           <button class="num-action send" type="button" id="sbSend" disabled>보내기</button>
         </div>
@@ -530,7 +590,7 @@
     </div>
 
     <div class="msg-section">
-      <div class="msg-section-label">내가 보낸 메시지</div>
+      <div class="msg-section-label">보낸 메시지</div>
       <div id="sentHistory">
         <div style="font-size:12px;color:var(--fg4);">전송 내역 없음</div>
       </div>
@@ -545,9 +605,9 @@
     <span id="fbStatus">Firebase 연결 중...</span>
   </div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span>고혈압 외래 · 환자 단말 · v5</span></div>
+  <div class="statusbar-item"><span>고혈압 외래</span></div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span id="roomLabel">방: —</span></div>
+  <div class="statusbar-item"><span id="roomLabel">—</span></div>
   <div class="statusbar-spacer"></div>
   <div class="statusbar-item"><span id="clock"></span></div>
 </div>
@@ -596,7 +656,7 @@
     document.getElementById('fbError').hidden = true;
   }
 
-  document.getElementById('roomLabel').textContent = `방: ${roomId}`;
+  document.getElementById('roomLabel').textContent = roomId;
 
   // Firebase 연결 상태
   db.ref('.info/connected').on('value', (snap) => {
@@ -620,12 +680,24 @@
   const recvHistory = [];
 
   // 의료진 메시지 수신
+
+  // 새 메시지가 도착하면 칸을 잠깐 반짝이게 함 (처음 화면을 열 때 불러온 메시지는 제외)
+  function flashBox(el) {
+    el.classList.remove('flash');
+    void el.offsetWidth;          // 애니메이션을 다시 시작하기 위한 처리
+    el.classList.add('flash');
+  }
+  let doctorMsgLoaded = false;
   roomRef('doctor_message').on('value', (snapshot) => {
+    const firstLoad = !doctorMsgLoaded;
+    doctorMsgLoaded = true;
     const data = snapshot.val();
     if (!data || !data.text) return;
     const t = new Date(data.time);
     const tStr = t.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     const sender = data.sender || '의료진';
+    document.querySelector('.doctor-msg-box').classList.toggle('from-nurse', sender === '간호사');
+    if (!firstLoad) flashBox(document.querySelector('.doctor-msg-box'));
     const msgEl = document.getElementById('doctorMsgText');
     // Caption with Intention: 단어별 순차 애니메이션
     function renderCaption(parts) {
@@ -752,11 +824,11 @@
     sbWordsEl.classList.toggle('empty', sbWords.length === 0);
 
     const { text, ruled } = composeSentence();
-    sbPreviewText.textContent = text || '보낼 문장이 여기에 표시돼요';
+    sbPreviewText.textContent = text;
     sbPreviewEl.classList.toggle('empty', !text);
     sbPreviewNote.className = 'sb-preview-note' + (text && !ruled && sbWords.length ? ' warn' : '');
     sbPreviewNote.textContent = !text ? ''
-      : ruled ? '문장으로 정리됨'
+      : ruled ? ''
       : sbWords.length ? '등록된 문장이 없어 단어를 그대로 보내요' : '';
     sbSendEl.disabled = !text;
     document.querySelectorAll('[data-unit]').forEach(b => b.classList.toggle('active', b.dataset.unit === numUnit));
@@ -823,6 +895,7 @@
   const CONFIRM_FRAMES = 15;
   const COOLDOWN_MS = 5000;
   const IGNORE_CLASSES = new Set(['없음']);
+  const SILHOUETTE_MIN_SCORE = 0.5;   // 코·양 어깨가 이 신뢰도 이상일 때 '사람 감지됨'
 
   const videoEl = document.getElementById('camera');
   let tmModel = null;
@@ -830,7 +903,7 @@
   let lastSentTime = 0;
 
   function setSilhouette(detected) {
-    const color = detected ? 'rgba(72,187,120,0.9)' : 'rgba(255,255,255,0.6)';
+    const color = detected ? '#6fe05a' : 'rgba(255,255,255,0.6)';
     document.getElementById('silhouette-head').setAttribute('stroke', color);
     document.getElementById('silhouette-shoulder').setAttribute('stroke', color);
     document.getElementById('silhouette-body').setAttribute('stroke', color);
@@ -904,11 +977,10 @@
     // 가장 높은 confidence 클래스 찾기
     let best = predictions.reduce((a, b) => a.probability > b.probability ? a : b);
 
-    if (pose && pose.keypoints && pose.keypoints.length > 0) {
-      setSilhouette(true);
-    } else {
-      setSilhouette(false);
-    }
+    // PoseNet은 사람이 없어도 관절 17개를 항상 돌려주므로, 관절별 신뢰도(score)로 실제 감지 여부를 판단
+    const kp = (pose && pose.keypoints) || [];
+    const seen = (part) => kp.some(k => k.part === part && k.score >= SILHOUETTE_MIN_SCORE);
+    setSilhouette(seen('nose') && seen('leftShoulder') && seen('rightShoulder'));
 
     const bestClean = cleanClassName(best.className);
     if (best.probability >= CONFIDENCE_THRESHOLD && !IGNORE_CLASSES.has(bestClean)) {
