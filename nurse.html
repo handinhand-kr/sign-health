@@ -7,27 +7,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f3f8f8;
-      --surface: #ffffff;
-      --surface2: #f0fdfb;
-      --border: #d1ede9;
-      --fg: #111827;
-      --fg2: #374151;
-      --fg3: #6b7280;
-      --fg4: #9ca3af;
-      --accent: #0f766e;
-      --accent-bg: #f0fdfa;
-      --accent-border: #99f6e4;
-      --green: #15803d;
-      --green-bg: #f0fdf4;
-      --green-border: #bbf7d0;
-      --blue: #1d4ed8;
-      --blue-bg: #eff6ff;
-      --blue-border: #bfdbfe;
-      --red: #b91c1c;
-      --red-bg: #fef2f2;
-      --statusbar: #134e4a;
-      --statusbar-fg: #99f6e4;
+      /* 공통 바탕 (세 화면 동일) */
+      --bg: #f5f6f8; --surface: #ffffff; --surface2: #f9fafb; --border: #e3e6ec;
+      --fg: #111827; --fg2: #374151; --fg3: #6b7280; --fg4: #9ca3af;
+      --statusbar: #1f2430; --statusbar-fg: #c9d0e0;
+      /* 역할 색 (세 화면 동일): 환자 연두 · 간호사 연보라~분홍 · 의사 파랑 */
+      --patient: #34871d; --patient-strong: #225c13; --patient-soft: #77c566;
+      --patient-border: #b8e7ae; --patient-bg: #e9fbe5; --patient-chip: #d0f4c8;
+      --nurse: #914a8c; --nurse-strong: #672e63; --nurse-soft: #cc8bc5;
+      --nurse-border: #efcfeb; --nurse-bg: #fdf3fc;
+      --doctor: #3a65b8; --doctor-strong: #254582; --doctor-soft: #7fa4ea;
+      --doctor-border: #c9dcfd; --doctor-bg: #f1f7ff;
+      /* 경고(빨강) · 강조 표시(노랑) */
+      --red: #b91c1c; --red-bg: #fef2f2;
+      --emph: #78350f; --emph-bg: #fde68a;
+      /* 이 화면의 기본 색 = 간호사 */
+      --accent: var(--nurse); --accent-strong: var(--nurse-strong);
+      --accent-bg: var(--nurse-bg); --accent-border: var(--nurse-border);
+      /* 예전 이름 호환: green = 환자, blue = 의사 */
+      --green: var(--patient); --green-bg: var(--patient-bg); --green-border: var(--patient-border);
+      --blue: var(--doctor); --blue-bg: var(--doctor-bg); --blue-border: var(--doctor-border);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
@@ -223,7 +222,7 @@
     .cmd-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
     .cmd-btn.active {
       border-color: var(--accent); background: var(--accent-bg);
-      box-shadow: 0 0 0 3px rgba(15,118,110,0.1);
+      box-shadow: 0 0 0 3px rgba(145,74,140,0.12);
     }
     .cmd-btn-label { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: -0.02em; margin-bottom: 3px; }
     .cmd-btn.active .cmd-btn-label { color: var(--accent); }
@@ -343,6 +342,25 @@
     .popup-close:hover { background: var(--bg); color: var(--fg); }
     .popup-body { padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
     .popup .staff-log { height: 320px; }
+
+    /* ===== 색 통일 (공통) ===== */
+    .topnav { border-bottom: 2px solid var(--accent-border); }
+    .status-dot-sm.connected { background: #22c55e; }
+    .staff-meta b.nurse { color: var(--nurse); }
+    .staff-meta b.doctor { color: var(--doctor); }
+    .staff-bubble.nurse { background: var(--nurse-bg); border-color: var(--nurse-border); color: var(--nurse-strong); }
+    .staff-bubble.doctor { background: var(--doctor-bg); border-color: var(--doctor-border); color: var(--doctor-strong); }
+    .patient-msg-time { color: var(--patient); }
+
+    /* 교육 범주는 간호사 색의 테두리형으로 (파랑은 의사 색이므로 사용하지 않음) */
+    .sent-log-cat.edu { background: var(--surface); color: var(--nurse-strong); border: 1px solid var(--nurse-border); }
+
+    /* ===== v7: 머리글·라벨을 진하고 크게 ===== */
+    .app-name { font-size: 18px; }
+    .role-tag { font-size: 13px; padding: 4px 11px; }
+    .panel-label { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: 0; text-transform: none; }
+    .patient-meta { font-size: 13px; color: var(--fg); }
+    .section-sub { font-size: 12px; color: var(--fg2); }
   </style>
 </head>
 <body>
@@ -403,7 +421,7 @@
       <div class="panel-label">활력징후</div>
       <div class="bp-reading">
         <div class="bp-value">158 / 96</div>
-        <div class="bp-label">mmHg · 오늘 14:29 측정</div>
+        <div class="bp-label">오늘 14:29 측정</div>
 
       </div>
       <div class="info-row" style="margin-top:10px;">
@@ -475,7 +493,6 @@
     <div>
       <div class="section-header">
         <span class="section-title">환자 수신 메시지</span>
-        <span class="section-sub">수어 인식 · Firebase 실시간</span>
       </div>
       <div class="patient-msg-box">
         <div class="patient-msg-main">
@@ -491,17 +508,14 @@
     <div>
       <div class="section-header">
         <span class="section-title">메시지 전송</span>
-        <span class="section-sub">환자 화면으로 텍스트 전송</span>
       </div>
 
       <div class="tab-bar">
         <button class="tab active" onclick="switchTab('care', this)">
           간호 처치
-          <span class="tab-sub">활력징후·투약·안전</span>
         </button>
         <button class="tab" onclick="switchTab('edu', this)">
           교육·안내
-          <span class="tab-sub">복약·식이·자가관리</span>
         </button>
       </div>
 
@@ -570,10 +584,8 @@
     <div>
       <div class="section-header">
         <span class="section-title">전송 내역</span>
-        <span class="section-sub">오늘</span>
       </div>
       <div class="sent-log">
-        <div class="sent-log-header">구분 · 내용 · 시간</div>
         <div id="sentLog">
           <div class="sent-log-row" style="color:var(--fg4);font-size:12px;justify-content:center;">전송 내역 없음</div>
         </div>
@@ -586,7 +598,7 @@
 <!-- 팝업: 음성 인식 -->
 <div class="popup" id="voicePopup" role="dialog" aria-label="음성 인식" hidden>
   <div class="popup-head">
-    <div><div class="popup-title">음성 인식</div><div class="popup-sub">인식 후 수정 → 강조 → 전송</div></div>
+    <div><div class="popup-title">음성 인식</div></div>
     <button class="popup-close" type="button" data-close="voice" aria-label="닫기">×</button>
   </div>
   <div class="popup-body">
@@ -608,7 +620,7 @@
             background:var(--surface); outline:none; line-height:1.6;
             cursor:text;
           "
-          data-placeholder="음성 인식 결과가 여기에 표시됩니다. 직접 수정하거나 단어를 선택해 강조하세요."
+          data-placeholder="음성 인식 결과"
         ></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -635,7 +647,6 @@
           border:none;background:var(--accent);color:white;font-family:inherit;
         ">전송</button>
       </div>
-      <div style="font-size:10px;color:var(--fg4);">단어를 드래그로 선택 후 '선택 단어 강조' 누르면 환자 화면에서 크게 표시됩니다</div>
     </div>
 
   </div>
@@ -644,17 +655,17 @@
 <!-- 팝업: 메시지 -->
 <div class="popup" id="staffPopup" role="dialog" aria-label="메시지" hidden>
   <div class="popup-head">
-    <div><div class="popup-title">메시지</div><div class="popup-sub">간호사 ↔ 의사 · 환자 화면에는 표시되지 않음</div></div>
+    <div><div class="popup-title">메시지</div></div>
     <button class="popup-close" type="button" data-close="staff" aria-label="닫기">×</button>
   </div>
   <div class="popup-body">
     <!-- 의료진 메시지 (간호사 ↔ 의사) -->
     <div>
       <div class="staff-chat">
-        <div class="staff-log" id="staffLog"><div class="staff-empty">주고받은 메시지가 없습니다</div></div>
+        <div class="staff-log" id="staffLog"></div>
         <div class="staff-input-row">
           <button class="staff-btn" type="button" id="staffQuote" title="최근 환자 메시지를 입력창에 넣기">환자 메시지 인용</button>
-          <textarea class="staff-input" id="staffInput" placeholder="메시지 입력 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+          <textarea class="staff-input" id="staffInput" placeholder="메시지 입력"></textarea>
           <button class="staff-btn send" type="button" id="staffSend">보내기</button>
         </div>
       </div>
@@ -671,7 +682,7 @@
   <div class="statusbar-divider"></div>
   <div class="statusbar-item"><span>고혈압 외래 · 간호사실</span></div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span id="roomLabel">방: —</span></div>
+  <div class="statusbar-item"><span id="roomLabel">—</span></div>
   <div class="statusbar-spacer"></div>
   <div class="statusbar-item"><span id="clock"></span></div>
 </div>
@@ -717,7 +728,7 @@
     document.getElementById('fbError').hidden = true;
   }
 
-  document.getElementById('roomLabel').textContent = `방: ${roomId}`;
+  document.getElementById('roomLabel').textContent = roomId;
 
   // Firebase 연결 상태
   db.ref('.info/connected').on('value', (snap) => {
@@ -809,7 +820,7 @@
   function renderStaffMessages(list) {
     staffLogEl.innerHTML = '';
     if (list.length === 0) {
-      staffLogEl.innerHTML = '<div class="staff-empty">주고받은 메시지가 없습니다</div>';
+      staffLogEl.innerHTML = '';
       return;
     }
     list.forEach(m => {
@@ -932,7 +943,7 @@
     if (!editor.contains(range.commonAncestorContainer)) return;
     const span = document.createElement('span');
     span.className = 'nurse-emph';
-    span.style.cssText = 'font-weight:900;font-size:1.25em;color:var(--accent);background:var(--accent-bg);border-radius:3px;padding:0 2px;';
+    span.style.cssText = 'font-weight:900;font-size:1.25em;color:var(--emph);background:var(--emph-bg);border-radius:3px;padding:0 2px;';
     try { range.surroundContents(span); } catch(e) {}
     sel.removeAllRanges();
   };
