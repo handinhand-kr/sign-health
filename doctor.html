@@ -252,9 +252,22 @@
     .status-dot-sm.connected { background: #22c55e; }
     .statusbar-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.15); }
     .statusbar-spacer { flex: 1; }
+
+    /* Firebase 오류 안내 */
+    .fb-error {
+      position: fixed; left: 50%; top: 64px; transform: translateX(-50%);
+      z-index: 1000; width: min(560px, calc(100% - 32px));
+      background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b;
+      padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.55;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .fb-error b { display: block; font-size: 14px; margin-bottom: 2px; }
+    .fb-error code { background: #fee2e2; padding: 0 4px; border-radius: 3px; font-size: 12px; }
   </style>
 </head>
 <body>
+
+<div class="fb-error" id="fbError" hidden></div>
 
 <div class="topnav">
   <div class="topnav-left">
@@ -512,6 +525,28 @@
   // 방(Room) 설정
   const roomId = new URLSearchParams(location.search).get('room') || 'default';
   const roomRef = (path) => ref(db, `rooms/${roomId}/${path}`);
+
+  // Firebase 전송·수신 오류를 화면에 표시 (기존에는 실패해도 아무 표시가 없었음)
+  let fbBlocked = false;
+  function reportFbError(action, err) {
+    console.error('[SignHealth]', action, err);
+    const code = (err && (err.code || err.message)) || String(err);
+    const denied = /permission/i.test(code);
+    fbBlocked = true;
+    const box = document.getElementById('fbError');
+    box.innerHTML = `<b>${action} 실패</b>` + (denied
+      ? 'Firebase 데이터베이스 규칙이 읽기·쓰기를 막고 있습니다. Firebase 콘솔 → Realtime Database → <code>규칙</code> 탭을 확인하세요.'
+      : `오류 내용: <code>${code}</code>`);
+    box.hidden = false;
+    document.getElementById('fbStatus').textContent = denied ? 'Firebase 권한 거부' : 'Firebase 오류';
+    document.getElementById('fbDot').classList.remove('connected');
+  }
+  function clearFbError() {
+    if (!fbBlocked) return;
+    fbBlocked = false;
+    document.getElementById('fbError').hidden = true;
+  }
+
   document.getElementById('roomLabel').textContent = `방: ${roomId}`;
 
   // Firebase 연결 상태
@@ -519,6 +554,7 @@
   onValue(connectedRef, (snap) => {
     const dot = document.getElementById('fbDot');
     const status = document.getElementById('fbStatus');
+    if (fbBlocked) return;
     if (snap.val()) {
       dot.classList.add('connected');
       status.textContent = 'Firebase 연결됨';
@@ -540,7 +576,7 @@
       text: message,
       time: Date.now(),
       sender: '의사'
-    });
+    }).then(clearFbError).catch(err => reportFbError('메시지 전송', err));
 
     // 선택 버튼 하이라이트
     document.querySelectorAll('.cmd-btn').forEach(b => b.classList.remove('active'));
@@ -579,10 +615,11 @@
       document.getElementById('receivedText').textContent = data.text;
       const t = new Date(data.time);
       document.getElementById('receivedTime').textContent =
-        t.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' 수신';
+        t.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' 수신'
+        + (data.words && data.words.length ? ' · 인식 단어: ' + data.words.join(' · ') : '');
       document.getElementById('receivedBadge').style.display = '';
     }
-  });
+  }, err => reportFbError('환자 메시지 수신', err));
 
   // 버튼 이벤트
   document.querySelectorAll('[data-msg]').forEach(btn => {
@@ -691,7 +728,7 @@
       parts: parts,
       time: Date.now(),
       sender: '의사'
-    });
+    }).then(clearFbError).catch(err => reportFbError('음성 자막 전송', err));
 
     // 전송 로그
     const t = new Date();

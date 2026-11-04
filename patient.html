@@ -352,28 +352,33 @@
     .fb-error b { display: block; font-size: 14px; margin-bottom: 2px; }
     .fb-error code { background: #fee2e2; padding: 0 4px; border-radius: 3px; font-size: 12px; }
 
-    /* 숫자 입력 */
-    .num-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      flex-shrink: 0;
+    /* 문장 만들기 (단어 + 숫자) */
+    .sb-body { display: flex; flex-direction: column; gap: 10px; }
+    .sb-words {
+      min-height: 46px; padding: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      background: var(--surface2); border: 1px dashed var(--border); border-radius: 8px;
     }
-    .num-body { display: flex; flex-direction: column; gap: 10px; }
-    .num-preview {
-      min-height: 44px; padding: 8px 12px;
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
-      font-size: 20px; font-weight: 700; color: var(--fg); letter-spacing: -0.01em;
-      display: flex; align-items: center;
+    .sb-words.empty::before { content: '수어로 단어를 표현하면 여기에 쌓여요'; font-size: 12px; color: var(--fg4); padding: 0 6px; }
+    .sb-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green);
+      font-size: 16px; font-weight: 700; padding: 4px 6px 4px 10px; border-radius: 6px;
     }
-    .num-preview.empty { font-size: 13px; font-weight: 500; color: var(--fg4); }
-    .num-attach { font-size: 12px; color: var(--fg2); display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    .num-attach input { width: 16px; height: 16px; accent-color: var(--accent); }
-    .num-attach.disabled { color: var(--fg4); cursor: default; }
-    .num-attach b { color: var(--green); }
-    .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-    .num-units { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .sb-chip button {
+      border: none; background: none; color: var(--green); font-size: 16px; line-height: 1;
+      width: 22px; height: 22px; border-radius: 4px; cursor: pointer; font-family: inherit;
+    }
+    .sb-chip button:hover { background: var(--green-border); }
+    .sb-preview {
+      min-height: 52px; padding: 8px 12px;
+      background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 8px;
+      display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    }
+    .sb-preview-text { font-size: 20px; font-weight: 700; color: var(--fg); letter-spacing: -0.01em; }
+    .sb-preview.empty .sb-preview-text { font-size: 13px; font-weight: 500; color: var(--fg4); }
+    .sb-preview-note { font-size: 11px; color: var(--accent); }
+    .sb-preview-note.warn { color: #b45309; }
+    .num-grid, .num-units { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
     .num-btn {
       height: 46px; border-radius: 8px; border: 1px solid var(--border);
       background: var(--surface); color: var(--fg);
@@ -383,7 +388,7 @@
     .num-btn:hover { background: var(--surface2); }
     .num-btn:active { background: var(--accent-bg); }
     .num-btn.unit { font-size: 16px; }
-    .num-btn.unit.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+    .num-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
     .num-actions { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 6px; }
     .num-action {
       height: 44px; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
@@ -498,21 +503,21 @@
       </div>
     </div>
 
-    <!-- 숫자 입력 (기간·횟수·통증 점수) -->
+    <!-- 문장 만들기: 수어 단어 + 숫자 -->
     <div class="msg-section">
-      <div class="msg-section-label">숫자 입력 · 기간 · 횟수 · 통증 점수</div>
-      <div class="num-body">
-        <div class="num-preview empty" id="numPreview">숫자를 눌러주세요</div>
-        <label class="num-attach disabled" id="numAttachLabel">
-          <input type="checkbox" id="numAttach" disabled>
-          <span id="numAttachText">보낸 수어가 있으면 함께 보낼 수 있어요</span>
-        </label>
+      <div class="msg-section-label">문장 만들기 · 수어 단어 + 숫자</div>
+      <div class="sb-body">
+        <div class="sb-words empty" id="sbWords"></div>
         <div class="num-grid" id="numGrid"></div>
         <div class="num-units" id="numUnits"></div>
+        <div class="sb-preview empty" id="sbPreview">
+          <div class="sb-preview-text" id="sbPreviewText">보낼 문장이 여기에 표시돼요</div>
+          <div class="sb-preview-note" id="sbPreviewNote"></div>
+        </div>
         <div class="num-actions">
-          <button class="num-action" type="button" id="numBack">← 지우기</button>
-          <button class="num-action" type="button" id="numClear">초기화</button>
-          <button class="num-action send" type="button" id="numSend" disabled>보내기</button>
+          <button class="num-action" type="button" id="sbBack">← 지우기</button>
+          <button class="num-action" type="button" id="sbClear">초기화</button>
+          <button class="num-action send" type="button" id="sbSend" disabled>보내기</button>
         </div>
       </div>
     </div>
@@ -540,7 +545,7 @@
     <span id="fbStatus">Firebase 연결 중...</span>
   </div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span>고혈압 외래 · 환자 단말 · v2 (숫자 입력)</span></div>
+  <div class="statusbar-item"><span>고혈압 외래 · 환자 단말 · v3 (문장 만들기)</span></div>
   <div class="statusbar-divider"></div>
   <div class="statusbar-item"><span id="roomLabel">방: —</span></div>
   <div class="statusbar-spacer"></div>
@@ -670,91 +675,128 @@
   // 보낸 내역
   const sentList = [];
 
-  // 환자 → 의료진 전송 (kind: 'sign' 수어 인식, 'number' 숫자 입력)
-  function sendPatientMessage(text, kind) {
-    roomRef('patient_message').set({ text, kind, time: Date.now() })
+  // ===== 문장 규칙 =====
+  // words: 이 단어들이 모두 있으면 적용 (순서 무관). 단어 이름은 Teachable Machine 클래스 이름과 같아야 함.
+  // base: 숫자가 없을 때 문장 / withNumber: 단위별 문장 ({n} 자리에 '3일' 등이 들어감)
+  const SENTENCE_RULES = [
+    { words: ['약', '먹다', '아니다'],
+      base: '약을 안 먹었어요',
+      withNumber: { '일': '{n} 동안 약을 안 먹었어요', '주': '{n} 동안 약을 안 먹었어요', '번': '약을 {n} 안 먹었어요' } },
+    { words: ['머리', '아프다'],
+      base: '머리가 아파요',
+      withNumber: { '일': '{n} 전부터 머리가 아파요', '주': '{n} 전부터 머리가 아파요',
+                    '시간': '{n} 전부터 머리가 아파요', '점': '머리가 아파요 (통증 {n})' } },
+    { words: ['어지럽다', '아침'],
+      base: '아침에 어지러워요',
+      withNumber: { '일': '{n} 전부터 아침에 어지러워요', '주': '{n} 전부터 아침에 어지러워요' } },
+  ];
+  const WORD_COOLDOWN_MS = 1000;   // 같은 단어는 중복으로 쌓지 않으므로 단어 사이 대기는 짧게
+
+  // 환자 → 의료진 전송
+  function sendPatientMessage(payload) {
+    roomRef('patient_message').set({ ...payload, time: Date.now() })
       .then(clearFbError)
       .catch(err => reportFbError('메시지 전송', err));
-    sentList.unshift({ text, kind, time: timeStr() });
+    sentList.unshift({ text: payload.text, words: payload.words, time: timeStr() });
     renderSentHistory();
   }
 
-  function sendGesture(gesture) {
-    sendPatientMessage(gesture, 'sign');
-    lastSign = gesture;
-    numAttachEl.checked = true;
-    updateNumUI();
-  }
-
-  // ---- 숫자 입력 ----
-  // 수어로 표현하기 어려운 숫자(손가락 형태 구분 불가)는 버튼으로 입력한다.
-  // 예: 수어 '약 안 먹었어요' 전송 후 3 + 일 → '약 안 먹었어요 (3일)'
-  const NUM_UNITS = ['일', '주', '시간', '번', '점'];
-  const NUM_MAX_DIGITS = 3;
+  // 인식 확정된 수어 → 단어 목록에 추가 (같은 단어는 한 번만)
+  let sbWords = [];
   let numDigits = '';
   let numUnit = '';
-  let lastSign = '';
+  const NUM_UNITS = ['일', '주', '시간', '번', '점'];
+  const NUM_MAX_DIGITS = 3;
 
-  const numPreviewEl = document.getElementById('numPreview');
-  const numAttachEl = document.getElementById('numAttach');
-  const numAttachLabel = document.getElementById('numAttachLabel');
-  const numAttachText = document.getElementById('numAttachText');
-  const numSendEl = document.getElementById('numSend');
+  function addWord(word) {
+    if (sbWords.includes(word)) return false;
+    sbWords.push(word);
+    updateSentenceUI();
+    return true;
+  }
+
+  // 단어 집합이 규칙의 단어와 정확히 일치하면 그 규칙 사용 (순서 무관)
+  function findRule(words) {
+    const set = new Set(words);
+    return SENTENCE_RULES.find(r => r.words.length === set.size && r.words.every(w => set.has(w)));
+  }
+
+  function composeSentence() {
+    const n = numDigits ? String(Number(numDigits)) + numUnit : '';   // '03일' → '3일'
+    const rule = findRule(sbWords);
+    if (rule) {
+      if (!n) return { text: rule.base, ruled: true };
+      const tpl = numUnit && rule.withNumber[numUnit];
+      return { text: tpl ? tpl.replace('{n}', n) : `${rule.base} (${n})`, ruled: true };
+    }
+    const raw = sbWords.join(' ');
+    if (!raw) return { text: n, ruled: false };
+    return { text: n ? `${raw} (${n})` : raw, ruled: false };
+  }
+
+  const sbWordsEl = document.getElementById('sbWords');
+  const sbPreviewEl = document.getElementById('sbPreview');
+  const sbPreviewText = document.getElementById('sbPreviewText');
+  const sbPreviewNote = document.getElementById('sbPreviewNote');
+  const sbSendEl = document.getElementById('sbSend');
 
   document.getElementById('numGrid').innerHTML =
     ['1','2','3','4','5','6','7','8','9','0']
-      .map(d => `<button class="num-btn" type="button" data-digit="${d}">${d}</button>`).join('');
+      .map(x => `<button class="num-btn" type="button" data-digit="${x}">${x}</button>`).join('');
   document.getElementById('numUnits').innerHTML =
     NUM_UNITS.map(u => `<button class="num-btn unit" type="button" data-unit="${u}">${u}</button>`).join('');
 
-  function composeNumText() {
-    if (!numDigits) return '';
-    const value = String(Number(numDigits)) + numUnit;   // '03' → '3'
-    return (numAttachEl.checked && lastSign) ? `${lastSign} (${value})` : value;
+  function updateSentenceUI() {
+    sbWordsEl.innerHTML = sbWords.map((w, i) =>
+      `<span class="sb-chip">${w}<button type="button" data-remove="${i}" aria-label="${w} 삭제">×</button></span>`).join('');
+    sbWordsEl.classList.toggle('empty', sbWords.length === 0);
+
+    const { text, ruled } = composeSentence();
+    sbPreviewText.textContent = text || '보낼 문장이 여기에 표시돼요';
+    sbPreviewEl.classList.toggle('empty', !text);
+    sbPreviewNote.className = 'sb-preview-note' + (text && !ruled && sbWords.length ? ' warn' : '');
+    sbPreviewNote.textContent = !text ? ''
+      : ruled ? '문장으로 정리됨'
+      : sbWords.length ? '등록된 문장이 없어 단어를 그대로 보내요' : '';
+    sbSendEl.disabled = !text;
+    document.querySelectorAll('[data-unit]').forEach(b => b.classList.toggle('active', b.dataset.unit === numUnit));
   }
 
-  function updateNumUI() {
-    const text = composeNumText();
-    numPreviewEl.textContent = text || '숫자를 눌러주세요';
-    numPreviewEl.classList.toggle('empty', !text);
-    numSendEl.disabled = !text;
-    document.querySelectorAll('[data-unit]').forEach(b =>
-      b.classList.toggle('active', b.dataset.unit === numUnit));
-    numAttachEl.disabled = !lastSign;
-    numAttachLabel.classList.toggle('disabled', !lastSign);
-    numAttachText.innerHTML = lastSign
-      ? `최근 수어 <b>“${lastSign}”</b>와 함께 보내기`
-      : '보낸 수어가 있으면 함께 보낼 수 있어요';
-  }
+  function resetSentence() { sbWords = []; numDigits = ''; numUnit = ''; updateSentenceUI(); }
 
-  function resetNum() { numDigits = ''; numUnit = ''; updateNumUI(); }
-
+  sbWordsEl.addEventListener('click', e => {
+    const b = e.target.closest('[data-remove]');
+    if (!b) return;
+    sbWords.splice(Number(b.dataset.remove), 1);
+    updateSentenceUI();
+  });
   document.getElementById('numGrid').addEventListener('click', e => {
-    const d = e.target.closest('[data-digit]');
-    if (!d || numDigits.length >= NUM_MAX_DIGITS) return;
-    numDigits += d.dataset.digit;
-    updateNumUI();
+    const b = e.target.closest('[data-digit]');
+    if (!b || numDigits.length >= NUM_MAX_DIGITS) return;
+    numDigits += b.dataset.digit;
+    updateSentenceUI();
   });
   document.getElementById('numUnits').addEventListener('click', e => {
-    const u = e.target.closest('[data-unit]');
-    if (!u) return;
-    numUnit = (numUnit === u.dataset.unit) ? '' : u.dataset.unit;   // 다시 누르면 해제
-    updateNumUI();
+    const b = e.target.closest('[data-unit]');
+    if (!b) return;
+    numUnit = (numUnit === b.dataset.unit) ? '' : b.dataset.unit;   // 다시 누르면 해제
+    updateSentenceUI();
   });
-  numAttachEl.addEventListener('change', updateNumUI);
-  document.getElementById('numBack').addEventListener('click', () => {
-    if (numUnit) numUnit = ''; else numDigits = numDigits.slice(0, -1);
-    updateNumUI();
+  // 지우기: 단위 → 숫자 → 마지막 단어 순서로 하나씩
+  document.getElementById('sbBack').addEventListener('click', () => {
+    if (numUnit) numUnit = '';
+    else if (numDigits) numDigits = numDigits.slice(0, -1);
+    else sbWords.pop();
+    updateSentenceUI();
   });
-  document.getElementById('numClear').addEventListener('click', resetNum);
-  numSendEl.addEventListener('click', () => {
-    const text = composeNumText();
+  document.getElementById('sbClear').addEventListener('click', resetSentence);
+  sbSendEl.addEventListener('click', () => {
+    const { text } = composeSentence();
     if (!text) return;
-    sendPatientMessage(text, 'number');
-    numAttachEl.checked = false;   // 같은 수어에 숫자가 두 번 붙지 않도록
-    resetNum();
+    sendPatientMessage({ text, words: [...sbWords], number: numDigits ? String(Number(numDigits)) + numUnit : '' });
+    resetSentence();
   });
-  updateNumUI();
+  updateSentenceUI();
 
   function renderSentHistory() {
     const el = document.getElementById('sentHistory');
@@ -765,7 +807,7 @@
     el.innerHTML = sentList.slice(0, 8).map(item => `
       <div class="patient-sent-row">
         <span class="patient-sent-text">${item.text}</span>
-        <span class="patient-sent-meta">${item.time} · ${item.kind === 'number' ? '숫자 입력' : '수어 인식'} 전송</span>
+        <span class="patient-sent-meta">${item.time}${item.words && item.words.length ? ' · 인식 단어: ' + item.words.join(' · ') : ' · 숫자 입력'}</span>
       </div>
     `).join('');
   }
@@ -886,13 +928,13 @@
 
       if (allSame) {
         const now = Date.now();
-        if (now - lastSentTime > COOLDOWN_MS) {
+        if (now - lastSentTime > WORD_COOLDOWN_MS) {
           lastSentTime = now;
           recogDot.className = 'recog-dot confirmed';
           recogText.className = 'recog-text confirmed';
-          recogText.textContent = gesture + ' 전송됨';
-          recogProgress.textContent = '✓ 전송 완료';
-          sendGesture(gesture);
+          const added = addWord(gesture);
+          recogText.textContent = added ? gesture + ' 추가됨' : gesture + ' (이미 있음)';
+          recogProgress.textContent = added ? '✓ 단어 추가' : '';
         }
         gestureBuffer = [];
       }
