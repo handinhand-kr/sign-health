@@ -145,6 +145,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; cursor: pointer;
     }
+    .alert-chip.none { background: var(--surface2); border-color: var(--border); color: var(--fg3); }
+    .check-row { cursor: pointer; user-select: none; }
+    .check-row:hover .check-label { color: var(--accent); }
     .check-box.done { background: var(--accent); color: white; }
     .check-box.pending { border: 2px solid var(--border); }
     .check-label { font-size: 12px; color: var(--fg2); flex: 1; }
@@ -268,6 +271,78 @@
     }
     .fb-error b { display: block; font-size: 14px; margin-bottom: 2px; }
     .fb-error code { background: #fee2e2; padding: 0 4px; border-radius: 3px; font-size: 12px; }
+
+    /* 의료진 메시지 (간호사 ↔ 의사, 환자 화면에는 표시 안 됨) */
+    .staff-chat { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
+    .staff-log {
+      height: 200px; overflow-y: auto; padding: 10px 12px;
+      display: flex; flex-direction: column; gap: 8px; background: var(--surface2);
+    }
+    .staff-empty { margin: auto; font-size: 12px; color: var(--fg4); }
+    .staff-msg { max-width: 82%; display: flex; flex-direction: column; gap: 2px; }
+    .staff-msg.mine { align-self: flex-end; align-items: flex-end; }
+    .staff-msg.theirs { align-self: flex-start; align-items: flex-start; }
+    .staff-meta { font-size: 10px; color: var(--fg4); font-variant-numeric: tabular-nums; }
+    .staff-meta b { font-weight: 700; }
+    .staff-meta b.nurse { color: #0f766e; }
+    .staff-meta b.doctor { color: #1d4ed8; }
+    .staff-bubble {
+      font-size: 13px; line-height: 1.5; padding: 7px 11px; border-radius: 10px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .staff-bubble.nurse { background: #f0fdfa; border: 1px solid #99f6e4; color: #134e4a; }
+    .staff-bubble.doctor { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+    .staff-input-row { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--border); }
+    .staff-input {
+      flex: 1; min-width: 0; resize: none; height: 40px; padding: 9px 10px;
+      border: 1px solid var(--border); border-radius: 6px;
+      font-family: inherit; font-size: 13px; color: var(--fg); background: var(--surface); outline: none;
+    }
+    .staff-input:focus { border-color: var(--accent); }
+    .staff-btn {
+      flex-shrink: 0; padding: 0 12px; border-radius: 6px; cursor: pointer;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--surface); color: var(--fg3);
+    }
+    .staff-btn.send { border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; padding: 0 16px; }
+    .staff-new { font-size: 10px; font-weight: 700; color: #fff; background: #dc2626; padding: 1px 6px; border-radius: 8px; margin-left: 6px; }
+
+    /* 상단 메뉴 버튼 + 팝업 창 */
+    .nav-icon-btn {
+      display: flex; align-items: center; gap: 6px; position: relative;
+      background: var(--surface); border: 1px solid var(--border); color: var(--fg2);
+      font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px;
+      cursor: pointer; font-family: inherit;
+    }
+    .nav-icon-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-icon-btn:hover { background: var(--bg); }
+    .nav-icon-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+    .nav-icon-btn.listening::after {
+      content: ''; position: absolute; top: -4px; right: -4px;
+      width: 10px; height: 10px; border-radius: 50%; background: #dc2626; border: 2px solid var(--surface);
+    }
+    .nav-badge { font-size: 10px; font-weight: 700; color: #fff; background: #dc2626; padding: 1px 6px; border-radius: 8px; }
+    .popup {
+      position: fixed; top: 64px; right: 16px; z-index: 900;
+      width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 110px);
+      display: flex; flex-direction: column;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(15,23,42,0.18);
+    }
+    .popup[hidden] { display: none; }
+    .popup-head {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+    }
+    .popup-title { font-size: 14px; font-weight: 700; color: var(--fg); }
+    .popup-sub { font-size: 11px; color: var(--fg3); margin-top: 2px; }
+    .popup-close {
+      border: none; background: none; color: var(--fg3); font-size: 22px; line-height: 1;
+      width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font-family: inherit; flex-shrink: 0;
+    }
+    .popup-close:hover { background: var(--bg); color: var(--fg); }
+    .popup-body { padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .popup .staff-log { height: 320px; }
   </style>
 </head>
 <body>
@@ -283,6 +358,8 @@
     </div>
   </div>
   <div class="topnav-right">
+    <button class="nav-icon-btn" type="button" id="navVoice" aria-haspopup="dialog" aria-controls="voicePopup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg> 음성 인식</button>
+    <button class="nav-icon-btn" type="button" id="navStaff" aria-haspopup="dialog" aria-controls="staffPopup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> 메시지 <span class="nav-badge" id="staffNew" hidden>NEW</span></button>
     <button class="nav-btn">로그아웃</button>
   </div>
 </div>
@@ -335,22 +412,23 @@
       </div>
       <div class="info-row">
         <span class="info-key">체온</span>
-        <span class="info-val">36.7 °C</span>
+        <span class="info-val">36.5 °C</span>
       </div>
       <div class="info-row">
         <span class="info-key">SpO₂</span>
-        <span class="info-val">97 %</span>
+        <span class="info-val">98 %</span>
       </div>
       <div class="info-row">
         <span class="info-key">통증(NRS)</span>
-        <span class="info-val red">3 / 10</span>
+        <span class="info-val">0 / 10</span>
       </div>
     </div>
 
     <div class="panel-section">
       <div class="panel-label">알레르기 · 주의</div>
-      <span class="alert-chip">페니실린 알레르기</span>
+      <span class="alert-chip none">알레르기 없음</span>
       <span class="alert-chip">낙상 위험</span>
+      <span class="alert-chip">기립 시 어지럼증</span>
     </div>
 
     <div class="panel-section">
@@ -409,63 +487,11 @@
       </div>
     </div>
 
-    <!-- Voice compose area -->
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div class="section-header">
-        <span class="section-title">음성 자막 전송</span>
-        <span class="section-sub">인식 후 수정 → 강조 → 전송</span>
-      </div>
-      <div class="voice-status" id="voiceStatus" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;">
-        <div style="width:8px;height:8px;background:#dc2626;border-radius:50%;flex-shrink:0;"></div>
-        <div style="font-size:12px;color:var(--fg3);font-style:italic;" id="voiceTranscript">말씀해 주세요...</div>
-      </div>
-      <div style="position:relative;">
-        <div
-          id="voiceEditor"
-          contenteditable="true"
-          spellcheck="false"
-          style="
-            min-height:56px; padding:10px 12px;
-            border:1px solid var(--border); border-radius:8px;
-            font-size:15px; font-family:inherit; color:var(--fg);
-            background:var(--surface); outline:none; line-height:1.6;
-            cursor:text;
-          "
-          data-placeholder="음성 인식 결과가 여기에 표시됩니다. 직접 수정하거나 단어를 선택해 강조하세요."
-        ></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <button onclick="toggleVoice()" id="voiceBtn" style="
-          font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;
-          border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-family:inherit;
-          display:flex;align-items:center;gap:5px;
-        "><div style="width:7px;height:7px;background:var(--accent);border-radius:50%;"></div> 음성 인식</button>
-        <button onclick="emphasisSelected()" style="
-          font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;
-          border:1px solid #f59e0b;background:#fef3c7;color:#92400e;font-family:inherit;
-        ">선택 단어 강조</button>
-        <button onclick="clearEmphasis()" style="
-          font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer;
-          border:1px solid var(--border);background:var(--surface);color:var(--fg3);font-family:inherit;
-        ">강조 해제</button>
-        <button onclick="clearEditor()" style="
-          font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer;
-          border:1px solid var(--border);background:var(--surface);color:var(--fg3);font-family:inherit;
-        ">지우기</button>
-        <div style="flex:1;"></div>
-        <button onclick="sendVoiceMsg()" style="
-          font-size:13px;font-weight:700;padding:6px 18px;border-radius:6px;cursor:pointer;
-          border:none;background:var(--accent);color:white;font-family:inherit;
-        ">전송</button>
-      </div>
-      <div style="font-size:10px;color:var(--fg4);">단어를 드래그로 선택 후 '선택 단어 강조' 누르면 환자 화면에서 크게 표시됩니다</div>
-    </div>
-
     <!-- Tabs -->
     <div>
       <div class="section-header">
         <span class="section-title">메시지 전송</span>
-        <span class="section-sub">환자 화면으로 수어 영상 전송</span>
+        <span class="section-sub">환자 화면으로 텍스트 전송</span>
       </div>
 
       <div class="tab-bar">
@@ -550,6 +576,86 @@
         <div class="sent-log-header">구분 · 내용 · 시간</div>
         <div id="sentLog">
           <div class="sent-log-row" style="color:var(--fg4);font-size:12px;justify-content:center;">전송 내역 없음</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 팝업: 음성 인식 -->
+<div class="popup" id="voicePopup" role="dialog" aria-label="음성 인식" hidden>
+  <div class="popup-head">
+    <div><div class="popup-title">음성 인식</div><div class="popup-sub">인식 후 수정 → 강조 → 전송</div></div>
+    <button class="popup-close" type="button" data-close="voice" aria-label="닫기">×</button>
+  </div>
+  <div class="popup-body">
+    <!-- Voice compose area -->
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="voice-status" id="voiceStatus" style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;">
+        <div style="width:8px;height:8px;background:#dc2626;border-radius:50%;flex-shrink:0;"></div>
+        <div style="font-size:12px;color:var(--fg3);font-style:italic;" id="voiceTranscript">말씀해 주세요...</div>
+      </div>
+      <div style="position:relative;">
+        <div
+          id="voiceEditor"
+          contenteditable="true"
+          spellcheck="false"
+          style="
+            min-height:56px; padding:10px 12px;
+            border:1px solid var(--border); border-radius:8px;
+            font-size:15px; font-family:inherit; color:var(--fg);
+            background:var(--surface); outline:none; line-height:1.6;
+            cursor:text;
+          "
+          data-placeholder="음성 인식 결과가 여기에 표시됩니다. 직접 수정하거나 단어를 선택해 강조하세요."
+        ></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button onclick="toggleVoice()" id="voiceBtn" style="
+          font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;
+          border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-family:inherit;
+          display:flex;align-items:center;gap:5px;
+        "><div style="width:7px;height:7px;background:var(--accent);border-radius:50%;"></div> 음성 인식</button>
+        <button onclick="emphasisSelected()" style="
+          font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;
+          border:1px solid #f59e0b;background:#fef3c7;color:#92400e;font-family:inherit;
+        ">선택 단어 강조</button>
+        <button onclick="clearEmphasis()" style="
+          font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer;
+          border:1px solid var(--border);background:var(--surface);color:var(--fg3);font-family:inherit;
+        ">강조 해제</button>
+        <button onclick="clearEditor()" style="
+          font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer;
+          border:1px solid var(--border);background:var(--surface);color:var(--fg3);font-family:inherit;
+        ">지우기</button>
+        <div style="flex:1;"></div>
+        <button onclick="sendVoiceMsg()" style="
+          font-size:13px;font-weight:700;padding:6px 18px;border-radius:6px;cursor:pointer;
+          border:none;background:var(--accent);color:white;font-family:inherit;
+        ">전송</button>
+      </div>
+      <div style="font-size:10px;color:var(--fg4);">단어를 드래그로 선택 후 '선택 단어 강조' 누르면 환자 화면에서 크게 표시됩니다</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 팝업: 메시지 -->
+<div class="popup" id="staffPopup" role="dialog" aria-label="메시지" hidden>
+  <div class="popup-head">
+    <div><div class="popup-title">메시지</div><div class="popup-sub">간호사 ↔ 의사 · 환자 화면에는 표시되지 않음</div></div>
+    <button class="popup-close" type="button" data-close="staff" aria-label="닫기">×</button>
+  </div>
+  <div class="popup-body">
+    <!-- 의료진 메시지 (간호사 ↔ 의사) -->
+    <div>
+      <div class="staff-chat">
+        <div class="staff-log" id="staffLog"><div class="staff-empty">주고받은 메시지가 없습니다</div></div>
+        <div class="staff-input-row">
+          <button class="staff-btn" type="button" id="staffQuote" title="최근 환자 메시지를 입력창에 넣기">환자 메시지 인용</button>
+          <textarea class="staff-input" id="staffInput" placeholder="메시지 입력 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+          <button class="staff-btn send" type="button" id="staffSend">보내기</button>
         </div>
       </div>
     </div>
@@ -675,10 +781,95 @@
     const t = new Date(data.time);
     const tStr = t.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     document.getElementById('receivedText').textContent = data.text;
+    lastPatientText = data.text;
     document.getElementById('receivedTime').textContent = tStr + ' 수신'
       + (data.words && data.words.length ? ' · 인식 단어: ' + data.words.join(' · ') : '');
     document.getElementById('receivedBadge').style.display = '';
   }, err => reportFbError('환자 메시지 수신', err));
+
+
+  // ===== 의료진 메시지 (간호사 ↔ 의사) =====
+  // 환자용 경로(doctor_message, patient_message)와 분리된 staff_messages 경로를 사용하므로 환자 화면에는 표시되지 않는다.
+  const MY_ROLE = '간호사';
+  const staffLogEl = document.getElementById('staffLog');
+  const staffInputEl = document.getElementById('staffInput');
+  const staffNewEl = document.getElementById('staffNew');
+  let staffCount = -1;
+  let lastPatientText = '';
+
+  function sendStaffMessage() {
+    const text = staffInputEl.value.trim();
+    if (!text) return;
+    const msg = { text, sender: MY_ROLE, time: Date.now() };
+    roomRef('staff_messages').push(msg).then(clearFbError).catch(err => reportFbError('의료진 메시지 전송', err));
+    staffInputEl.value = '';
+    staffInputEl.focus();
+  }
+
+  function renderStaffMessages(list) {
+    staffLogEl.innerHTML = '';
+    if (list.length === 0) {
+      staffLogEl.innerHTML = '<div class="staff-empty">주고받은 메시지가 없습니다</div>';
+      return;
+    }
+    list.forEach(m => {
+      const roleCls = m.sender === '의사' ? 'doctor' : 'nurse';
+      const wrap = document.createElement('div');
+      wrap.className = 'staff-msg ' + (m.sender === MY_ROLE ? 'mine' : 'theirs');
+      const meta = document.createElement('div');
+      meta.className = 'staff-meta';
+      const who = document.createElement('b');
+      who.className = roleCls;
+      who.textContent = m.sender;
+      meta.append(who, ' · ' + new Date(m.time).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }));
+      const bubble = document.createElement('div');
+      bubble.className = 'staff-bubble ' + roleCls;
+      bubble.textContent = m.text;   // 입력 내용을 HTML로 해석하지 않음
+      wrap.append(meta, bubble);
+      staffLogEl.append(wrap);
+    });
+    staffLogEl.scrollTop = staffLogEl.scrollHeight;
+  }
+
+  roomRef('staff_messages').on('value', (snapshot) => {
+    const data = snapshot.val() || {};
+    const list = Object.values(data).filter(m => m && m.text).sort((a, b) => a.time - b.time);
+    renderStaffMessages(list);
+    // 상대방이 보낸 새 메시지가 오면 NEW 표시 (처음 불러올 때는 표시 안 함)
+    if (staffCount >= 0 && list.length > staffCount && list[list.length - 1].sender !== MY_ROLE && !isOpen('staff')) {
+      staffNewEl.hidden = false;
+    }
+    staffCount = list.length;
+  }, err => reportFbError('의료진 메시지 수신', err));
+
+  document.getElementById('staffSend').addEventListener('click', sendStaffMessage);
+  staffInputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendStaffMessage(); }
+  });
+  staffInputEl.addEventListener('focus', () => { staffNewEl.hidden = true; });
+  staffLogEl.addEventListener('click', () => { staffNewEl.hidden = true; });
+  // 최근 환자 메시지를 인용해 의사에게 보고할 수 있도록 입력창에 넣기
+  document.getElementById('staffQuote').addEventListener('click', () => {
+    if (!lastPatientText) return;
+    const quote = `[환자] ${lastPatientText}`;
+    staffInputEl.value = staffInputEl.value ? staffInputEl.value + '\n' + quote : quote + '\n';
+    staffInputEl.focus();
+  });
+
+  // 간호 체크리스트: 클릭하면 완료/미완료 전환, 완료 시각 기록
+  document.querySelectorAll('.check-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const box = row.querySelector('.check-box');
+      const label = row.querySelector('.check-label');
+      const time = row.querySelector('.check-time');
+      const done = !box.classList.contains('done');
+      box.classList.toggle('done', done);
+      box.classList.toggle('pending', !done);
+      box.textContent = done ? '✓' : '';
+      label.classList.toggle('done', done);
+      time.textContent = done ? timeStr().slice(0, 5) : '—';
+    });
+  });
 
   // 탭 전환
   function switchTab(name, tab) {
@@ -700,6 +891,7 @@
   window.toggleVoice = function() {
     const btn = document.getElementById('voiceBtn');
     listening = !listening;
+    document.getElementById('navVoice').classList.toggle('listening', listening);
     if (listening) {
       btn.style.background = '#dc2626';
       btn.style.borderColor = '#dc2626';
@@ -785,6 +977,29 @@
     editor.innerHTML = '';
     document.getElementById('voiceTranscript').textContent = '말씀해 주세요...';
   };
+
+
+  // ===== 상단 버튼으로 여는 팝업 창 (한 번에 하나만 열림) =====
+  const POPUPS = { voice: ['voicePopup', 'navVoice'], staff: ['staffPopup', 'navStaff'] };
+  function isOpen(name) { return !document.getElementById(POPUPS[name][0]).hidden; }
+  function closePopup(name) {
+    if (!isOpen(name)) return;
+    document.getElementById(POPUPS[name][0]).hidden = true;
+    document.getElementById(POPUPS[name][1]).classList.remove('active');
+    if (name === 'voice' && listening) window.toggleVoice();   // 창을 닫으면 음성 인식도 멈춤
+  }
+  function openPopup(name) {
+    Object.keys(POPUPS).forEach(k => { if (k !== name) closePopup(k); });
+    document.getElementById(POPUPS[name][0]).hidden = false;
+    document.getElementById(POPUPS[name][1]).classList.add('active');
+    if (name === 'staff') { staffNewEl.hidden = true; staffLogEl.scrollTop = staffLogEl.scrollHeight; staffInputEl.focus(); }
+    if (name === 'voice') document.getElementById('voiceEditor').focus();
+  }
+  Object.keys(POPUPS).forEach(name => {
+    document.getElementById(POPUPS[name][1]).addEventListener('click', () => isOpen(name) ? closePopup(name) : openPopup(name));
+  });
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closePopup(b.dataset.close)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') Object.keys(POPUPS).forEach(closePopup); });
 
   // 시계
   function tick() {
