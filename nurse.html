@@ -12,8 +12,9 @@
       --fg: #111827; --fg2: #374151; --fg3: #6b7280; --fg4: #9ca3af;
       --statusbar: #1f2430; --statusbar-fg: #c9d0e0;
       /* 역할 색 (세 화면 동일): 환자 연두 · 간호사 연보라~분홍 · 의사 파랑 */
-      --patient: #34871d; --patient-strong: #225c13; --patient-soft: #77c566;
-      --patient-border: #b8e7ae; --patient-bg: #e9fbe5; --patient-chip: #d0f4c8;
+      --patient: #424d63; --patient-strong: #2b354a; --patient-soft: #7d889e;
+      --patient-border: #c9d1e1; --patient-bg: #f0f3fa; --patient-chip: #dfe5f1;
+      --patient-rgb: 66,77,99;
       --nurse: #914a8c; --nurse-strong: #672e63; --nurse-soft: #cc8bc5;
       --nurse-border: #efcfeb; --nurse-bg: #fdf3fc;
       --doctor: #3a65b8; --doctor-strong: #254582; --doctor-soft: #7fa4ea;
@@ -361,6 +362,21 @@
     .panel-label { font-size: 13px; font-weight: 700; color: var(--fg); letter-spacing: 0; text-transform: none; }
     .patient-meta { font-size: 13px; color: var(--fg); }
     .section-sub { font-size: 12px; color: var(--fg2); }
+
+    /* ===== v8: 글씨 조금 키우기 (화면 전체 8% 확대) ===== */
+    html { zoom: 1.08; }
+    /* 새 메시지 도착 시 반짝임 (소리 대신 시각 알림) */
+    @keyframes msgFlash {
+      0%   { box-shadow: 0 0 0 0 rgba(var(--flash-rgb), 0); }
+      15%  { box-shadow: 0 0 0 6px rgba(var(--flash-rgb), 0.45); }
+      100% { box-shadow: 0 0 0 0 rgba(var(--flash-rgb), 0); }
+    }
+    .flash { animation: msgFlash 1.6s ease-out 1; }
+    /* 환자 수신 메시지: 왼쪽 굵은 띠, NEW 표시는 사용하지 않음 */
+    .patient-msg-box { border-left: 6px solid var(--patient); --flash-rgb: var(--patient-rgb); }
+    .patient-msg-badge { display: none !important; }
+    /* 메시지 버튼의 새 메시지 표시: 글자 대신 빨간 점 */
+    .nav-badge { width: 9px; height: 9px; padding: 0; border-radius: 50%; font-size: 0; }
   </style>
 </head>
 <body>
@@ -377,7 +393,7 @@
   </div>
   <div class="topnav-right">
     <button class="nav-icon-btn" type="button" id="navVoice" aria-haspopup="dialog" aria-controls="voicePopup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg> 음성 인식</button>
-    <button class="nav-icon-btn" type="button" id="navStaff" aria-haspopup="dialog" aria-controls="staffPopup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> 메시지 <span class="nav-badge" id="staffNew" hidden>NEW</span></button>
+    <button class="nav-icon-btn" type="button" id="navStaff" aria-haspopup="dialog" aria-controls="staffPopup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> 메시지 <span class="nav-badge" id="staffNew" hidden aria-label="새 메시지"></span></button>
     <button class="nav-btn">로그아웃</button>
   </div>
 </div>
@@ -665,7 +681,7 @@
         <div class="staff-log" id="staffLog"></div>
         <div class="staff-input-row">
           <button class="staff-btn" type="button" id="staffQuote" title="최근 환자 메시지를 입력창에 넣기">환자 메시지 인용</button>
-          <textarea class="staff-input" id="staffInput" placeholder="메시지 입력"></textarea>
+          <textarea class="staff-input" id="staffInput" placeholder="메시지 입력 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
           <button class="staff-btn send" type="button" id="staffSend">보내기</button>
         </div>
       </div>
@@ -786,7 +802,17 @@
   }
 
   // 환자 메시지 수신
+
+  // 새 메시지가 도착하면 칸을 잠깐 반짝이게 함 (처음 화면을 열 때 불러온 메시지는 제외)
+  function flashBox(el) {
+    el.classList.remove('flash');
+    void el.offsetWidth;          // 애니메이션을 다시 시작하기 위한 처리
+    el.classList.add('flash');
+  }
+  let patientMsgLoaded = false;
   roomRef('patient_message').on('value', (snapshot) => {
+    const firstLoad = !patientMsgLoaded;
+    patientMsgLoaded = true;
     const data = snapshot.val();
     if (!data || !data.text) return;
     const t = new Date(data.time);
@@ -796,6 +822,7 @@
     document.getElementById('receivedTime').textContent = tStr + ' 수신'
       + (data.words && data.words.length ? ' · 인식 단어: ' + data.words.join(' · ') : '');
     document.getElementById('receivedBadge').style.display = '';
+    if (!firstLoad) flashBox(document.querySelector('.patient-msg-box'));
   }, err => reportFbError('환자 메시지 수신', err));
 
 
