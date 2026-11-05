@@ -504,17 +504,12 @@
           <div class="pi-avatar">김</div>
           <div>
             <div class="pi-name">김○○</div>
-            <div class="pi-meta">67세 · 여성</div>
+            <div class="pi-meta">74세 · 여성</div>
           </div>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <span class="pi-badge dept">고혈압 외래</span>
-          <span class="pi-badge disability">청각장애 2급</span>
-        </div>
-        <div class="pi-divider"></div>
-        <div class="pi-bp">
-          <div class="pi-bp-val">158 / 96</div>
-          <div class="pi-bp-label">수축기 / 이완기 (mmHg)</div>
+          <span class="pi-badge dept">내과 외래 · 재진</span>
+          <span class="pi-badge disability">심한 청각장애</span>
         </div>
         <div class="pi-divider"></div>
         <div class="pi-row">
@@ -523,7 +518,7 @@
         </div>
         <div class="pi-row">
           <span class="pi-key">담당의</span>
-          <span class="pi-val">이○○ 교수</span>
+          <span class="pi-val">이○○ 원장</span>
         </div>
         <div class="pi-row">
           <span class="pi-key">담당간호사</span>
@@ -605,7 +600,7 @@
     <span id="fbStatus">Firebase 연결 중...</span>
   </div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span>고혈압 외래</span></div>
+  <div class="statusbar-item"><span>내과 외래 · 재진</span></div>
   <div class="statusbar-divider"></div>
   <div class="statusbar-item"><span id="roomLabel">—</span></div>
   <div class="statusbar-spacer"></div>
@@ -751,16 +746,22 @@
   // words: 이 단어들이 모두 있으면 적용 (순서 무관). 단어 이름은 Teachable Machine 클래스 이름과 같아야 함.
   // base: 숫자가 없을 때 문장 / withNumber: 단위별 문장 ({n} 자리에 '3일' 등이 들어감)
   const SENTENCE_RULES = [
-    { words: ['약', '먹다', '아니다'],
-      base: '약을 안 먹었어요',
-      withNumber: { '일': '{n} 동안 약을 안 먹었어요', '주': '{n} 동안 약을 안 먹었어요', '번': '약을 {n} 안 먹었어요' } },
-    { words: ['머리', '아프다'],
-      base: '머리가 아파요',
-      withNumber: { '일': '{n} 전부터 머리가 아파요', '주': '{n} 전부터 머리가 아파요',
-                    '시간': '{n} 전부터 머리가 아파요', '점': '머리가 아파요 (통증 {n})' } },
-    { words: ['어지럽다', '아침'],
-      base: '아침에 어지러워요',
-      withNumber: { '일': '{n} 전부터 아침에 어지러워요', '주': '{n} 전부터 아침에 어지러워요' } },
+    // 증상 호소 (주관적 자료)
+    { words: ['어지럽다'], base: '어지러워요',
+      withNumber: { '일': '{n} 전부터 어지러워요', '주': '{n} 전부터 어지러워요', '번': '오늘 {n} 어지러웠어요' } },
+    { words: ['어지럽다', '일어나다'], base: '일어날 때 어지러워요',
+      withNumber: { '일': '{n} 전부터 일어날 때 어지러워요', '주': '{n} 전부터 일어날 때 어지러워요' } },
+    { words: ['아프다'], base: '아파요', withNumber: { '점': '아파요 (통증 {n})' } },
+    { words: ['두통'], base: '머리가 아파요',
+      withNumber: { '일': '{n} 전부터 머리가 아파요', '시간': '{n} 전부터 머리가 아파요', '점': '머리가 아파요 (통증 {n})' } },
+    { words: ['피곤'], base: '피곤해요' },
+    // 질문
+    { words: ['혈압', '얼마'], base: '혈압이 몇이에요?' },
+    { words: ['걱정'], base: '걱정돼요' },
+    // 교육 후 다시 표현 (teach-back)
+    { words: ['천천히', '일어나다'], base: '천천히 일어날게요' },
+    { words: ['집', '운동'], base: '집에서 운동할게요' },
+    { words: ['술', '하지마'], base: '술을 안 마실게요' },
   ];
   const WORD_COOLDOWN_MS = 1000;   // 같은 단어는 중복으로 쌓지 않으므로 단어 사이 대기는 짧게
 
@@ -886,7 +887,7 @@
 
   // 클래스명에서 "Class N " 접두어 제거 (예: "Class 5 피로" → "피로")
   function cleanClassName(name) {
-    return name.replace(/^[Cc]lass\s*\d+\s*/,'').trim();
+    return name.replace(/^[Cc]lass\s*\d+\s*/,'').split(/[,/]/)[0].trim();
   }
 
   // Teachable Machine Pose 모델
