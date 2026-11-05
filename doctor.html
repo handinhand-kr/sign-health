@@ -403,9 +403,9 @@
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="patient-name">김○○</div>
-            <span class="dept-tag">고혈압 외래</span>
+            <span class="dept-tag">내과 외래 · 재진</span>
           </div>
-          <div class="patient-meta">67세 · 여 · 청각장애 2급</div>
+          <div class="patient-meta">74세 · 여 · 심한 청각장애</div>
         </div>
       </div>
       <div class="info-row">
@@ -414,11 +414,11 @@
       </div>
       <div class="info-row">
         <span class="info-key">진료과</span>
-        <span class="info-val">순환기내과</span>
+        <span class="info-val">내과 (재진)</span>
       </div>
       <div class="info-row">
         <span class="info-key">담당의</span>
-        <span class="info-val">이○○ 교수</span>
+        <span class="info-val">이○○ 원장</span>
       </div>
       <div class="info-row">
         <span class="info-key">담당간호사</span>
@@ -431,38 +431,42 @@
     </div>
 
     <div class="panel-section">
-      <div class="panel-label">최근 혈압</div>
+      <div class="panel-label">기립 혈압</div>
       <div class="bp-reading">
-        <div class="bp-value">158 / 96</div>
-        <div class="bp-label">오늘 14:29 측정</div>
+        <div class="bp-value">90 / 60</div>
+        <div class="bp-label">선 자세 3분 · 오늘 14:29 측정</div>
       </div>
       <div class="info-row" style="margin-top:10px;">
-        <span class="info-key">지난 방문</span>
-        <span class="info-val red">162 / 98</span>
+        <span class="info-key">누운 자세</span>
+        <span class="info-val">120 / 76</span>
       </div>
       <div class="info-row">
-        <span class="info-key">목표 혈압</span>
-        <span class="info-val">130 / 80 미만</span>
+        <span class="info-key">선 자세 1분</span>
+        <span class="info-val">98 / 64</span>
       </div>
       <div class="info-row">
-        <span class="info-key">맥박</span>
-        <span class="info-val">78 bpm</span>
+        <span class="info-key">기립 시 변화 (3분)</span>
+        <span class="info-val red">−30 / −16</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">맥박 (누움 → 섬)</span>
+        <span class="info-val">70 → 84 bpm</span>
       </div>
     </div>
 
     <div class="panel-section">
       <div class="panel-label">진단명</div>
       <div>
-        <span class="diagnosis-chip">본태성 고혈압 I10</span>
-        <span class="diagnosis-chip">만성신장질환 N18</span>
+        <span class="diagnosis-chip">기립성 저혈압 I95.1</span>
       </div>
     </div>
 
     <div class="panel-section">
-      <div class="panel-label">현재 처방약</div>
-      <div class="med-item"><span>암로디핀 5mg</span><span class="med-dose">1T qd</span></div>
-      <div class="med-item"><span>로사르탄 50mg</span><span class="med-dose">1T qd</span></div>
-      <div class="med-item"><span>히드로클로로티아지드 12.5mg</span><span class="med-dose">1T qd</span></div>
+      <div class="panel-label">치료 계획</div>
+      <div class="med-item"><span>처방약</span><span class="med-dose">없음 · 생활습관 교정 우선</span></div>
+      <div class="med-item"><span>수분 섭취</span><span class="med-dose">하루 8컵 (약 1.6L)</span></div>
+      <div class="med-item"><span>압박 스타킹</span><span class="med-dose">기상 전 착용</span></div>
+      <div class="med-item"><span>재평가</span><span class="med-dose">4주 후 기립 혈압</span></div>
     </div>
 
     <div class="panel-section">
@@ -499,29 +503,29 @@
         <span class="section-title">메시지 전송</span>
       </div>
       <div class="cmd-grid" id="buttons">
-        <button class="cmd-btn" data-msg="혈압을 측정할게요">
-          <div class="cmd-btn-label">혈압 측정</div>
-          <div class="cmd-btn-sub">혈압을 측정할게요</div>
+        <button class="cmd-btn" data-msg="누워서, 서서 혈압을 잴게요">
+          <div class="cmd-btn-label">기립 혈압 측정</div>
+          <div class="cmd-btn-sub">누워서, 서서 혈압을 잴게요</div>
         </button>
-        <button class="cmd-btn" data-msg="약을 처방해드릴게요">
-          <div class="cmd-btn-label">약 처방</div>
-          <div class="cmd-btn-sub">약을 처방해드릴게요</div>
+        <button class="cmd-btn" data-msg="지금은 약 없이 생활습관으로 관리해요">
+          <div class="cmd-btn-label">치료 방침</div>
+          <div class="cmd-btn-sub">지금은 약 없이 생활습관으로 관리해요</div>
         </button>
-        <button class="cmd-btn" data-msg="소금을 줄여야 해요">
-          <div class="cmd-btn-label">소금 줄이기</div>
-          <div class="cmd-btn-sub">소금을 줄여야 해요</div>
+        <button class="cmd-btn" data-msg="물을 충분히 드세요">
+          <div class="cmd-btn-label">수분 섭취</div>
+          <div class="cmd-btn-sub">물을 충분히 드세요</div>
         </button>
-        <button class="cmd-btn" data-msg="운동이 필요해요">
-          <div class="cmd-btn-label">운동</div>
-          <div class="cmd-btn-sub">운동이 필요해요</div>
+        <button class="cmd-btn" data-msg="천천히 일어나세요">
+          <div class="cmd-btn-label">천천히 일어나기</div>
+          <div class="cmd-btn-sub">천천히 일어나세요</div>
         </button>
-        <button class="cmd-btn" data-msg="다음 주에 오세요">
+        <button class="cmd-btn" data-msg="4주 후에 오세요">
           <div class="cmd-btn-label">다음 방문</div>
-          <div class="cmd-btn-sub">다음 주에 오세요</div>
+          <div class="cmd-btn-sub">4주 후에 오세요</div>
         </button>
-        <button class="cmd-btn" data-msg="검사가 필요해요">
+        <button class="cmd-btn" data-msg="피검사와 심전도를 할게요">
           <div class="cmd-btn-label">검사</div>
-          <div class="cmd-btn-sub">검사가 필요해요</div>
+          <div class="cmd-btn-sub">피검사와 심전도를 할게요</div>
         </button>
       </div>
     </div>
@@ -632,7 +636,7 @@
     <span id="fbStatus">Firebase 연결 중...</span>
   </div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span>고혈압 외래 · 3진료실</span></div>
+  <div class="statusbar-item"><span>○○내과의원 · 진료실</span></div>
   <div class="statusbar-divider"></div>
   <div class="statusbar-item"><span id="roomLabel">—</span></div>
   <div class="statusbar-spacer"></div>
@@ -845,15 +849,15 @@
   let recognition = null;
   let listening = false;
   const VOICE_MAP = {
-    '혈압': '혈압을 측정할게요',
-    '측정': '혈압을 측정할게요',
-    '약': '약을 처방해드릴게요',
-    '처방': '약을 처방해드릴게요',
-    '소금': '소금을 줄여야 해요',
-    '운동': '운동이 필요해요',
-    '다음': '다음 주에 오세요',
-    '방문': '다음 주에 오세요',
-    '검사': '검사가 필요해요',
+    '혈압': '누워서, 서서 혈압을 잴게요',
+    '측정': '누워서, 서서 혈압을 잴게요',
+    '약': '지금은 약 없이 생활습관으로 관리해요',
+    '생활': '지금은 약 없이 생활습관으로 관리해요',
+    '천천히': '천천히 일어나세요',
+    '물': '물을 충분히 드세요',
+    '다음': '4주 후에 오세요',
+    '방문': '4주 후에 오세요',
+    '검사': '피검사와 심전도를 할게요',
   };
 
   window.toggleVoice = function() {
