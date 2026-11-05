@@ -410,9 +410,9 @@
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="patient-name">김○○</div>
-            <span class="dept-tag">고혈압 외래</span>
+            <span class="dept-tag">내과 외래 · 재진</span>
           </div>
-          <div class="patient-meta">67세 · 여 · 청각장애 2급</div>
+          <div class="patient-meta">74세 · 여 · 심한 청각장애</div>
         </div>
       </div>
       <div class="info-row">
@@ -425,7 +425,7 @@
       </div>
       <div class="info-row">
         <span class="info-key">담당의</span>
-        <span class="info-val">이○○ 교수</span>
+        <span class="info-val">이○○ 원장</span>
       </div>
       <div class="info-row">
         <span class="info-key">의사소통</span>
@@ -436,13 +436,20 @@
     <div class="panel-section">
       <div class="panel-label">활력징후</div>
       <div class="bp-reading">
-        <div class="bp-value">158 / 96</div>
-        <div class="bp-label">오늘 14:29 측정</div>
-
+        <div class="bp-value">90 / 60</div>
+        <div class="bp-label">선 자세 3분 · 오늘 14:29 측정</div>
       </div>
       <div class="info-row" style="margin-top:10px;">
-        <span class="info-key">맥박</span>
-        <span class="info-val">78 bpm</span>
+        <span class="info-key">누운 자세</span>
+        <span class="info-val">120 / 76</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">기립 시 변화</span>
+        <span class="info-val red">−30 / −16</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">맥박 (누움 → 섬)</span>
+        <span class="info-val">70 → 84 bpm</span>
       </div>
       <div class="info-row">
         <span class="info-key">체온</span>
@@ -469,17 +476,17 @@
       <div class="panel-label">간호 체크리스트</div>
       <div class="check-row">
         <div class="check-box done">✓</div>
-        <span class="check-label done">혈압 측정</span>
+        <span class="check-label done">기립 혈압 측정</span>
         <span class="check-time">14:29</span>
       </div>
       <div class="check-row">
         <div class="check-box done">✓</div>
-        <span class="check-label done">투약 확인</span>
+        <span class="check-label done">복용 약물 확인</span>
         <span class="check-time">14:28</span>
       </div>
       <div class="check-row">
         <div class="check-box pending"></div>
-        <span class="check-label">통증 재사정</span>
+        <span class="check-label">낙상 위험 평가</span>
         <span class="check-time">—</span>
       </div>
       <div class="check-row">
@@ -538,17 +545,17 @@
       <!-- Care tab -->
       <div class="tab-panel active" id="tab-care">
         <div class="cmd-grid">
-          <button class="cmd-btn" data-msg="지금 어디가 아프세요?" data-cat="nurse">
-            <div class="cmd-btn-label">통증 사정</div>
-            <div class="cmd-btn-sub">지금 어디가 아프세요?</div>
+          <button class="cmd-btn" data-msg="지금 어지러우세요?" data-cat="nurse">
+            <div class="cmd-btn-label">증상 사정</div>
+            <div class="cmd-btn-sub">지금 어지러우세요?</div>
           </button>
-          <button class="cmd-btn" data-msg="약을 드릴게요" data-cat="nurse">
-            <div class="cmd-btn-label">투약 안내</div>
-            <div class="cmd-btn-sub">약을 드릴게요</div>
+          <button class="cmd-btn" data-msg="드시는 약이 있나요?" data-cat="nurse">
+            <div class="cmd-btn-label">약물 확인</div>
+            <div class="cmd-btn-sub">드시는 약이 있나요?</div>
           </button>
-          <button class="cmd-btn" data-msg="체온을 재겠습니다" data-cat="nurse">
-            <div class="cmd-btn-label">체온 측정</div>
-            <div class="cmd-btn-sub">체온을 재겠습니다</div>
+          <button class="cmd-btn" data-msg="누워서 혈압을 잴게요" data-cat="nurse">
+            <div class="cmd-btn-label">기립 혈압 측정</div>
+            <div class="cmd-btn-sub">누워서 혈압을 잴게요</div>
           </button>
           <button class="cmd-btn" data-msg="천천히 일어나세요" data-cat="nurse">
             <div class="cmd-btn-label">천천히 일어나세요</div>
@@ -568,29 +575,41 @@
       <!-- Education tab -->
       <div class="tab-panel" id="tab-edu">
         <div class="cmd-grid">
-          <button class="cmd-btn" data-msg="약 잘 드셨나요?" data-cat="edu">
-            <div class="cmd-btn-label">복약 확인</div>
-            <div class="cmd-btn-sub">약 잘 드셨나요?</div>
+          <button class="cmd-btn" data-msg="물을 자주 나눠 드세요" data-cat="edu">
+            <div class="cmd-btn-label">수분 섭취</div>
+            <div class="cmd-btn-sub">물을 자주 나눠 드세요</div>
           </button>
-          <button class="cmd-btn" data-msg="집에서 혈압 재세요" data-cat="edu">
-            <div class="cmd-btn-label">혈압 자가측정</div>
-            <div class="cmd-btn-sub">집에서 혈압 재세요</div>
+          <button class="cmd-btn" data-msg="아침을 꼭 드세요" data-cat="edu">
+            <div class="cmd-btn-label">규칙적 식사</div>
+            <div class="cmd-btn-sub">아침을 꼭 드세요</div>
           </button>
-          <button class="cmd-btn" data-msg="짠 음식 줄이세요" data-cat="edu">
-            <div class="cmd-btn-label">저염식</div>
-            <div class="cmd-btn-sub">짠 음식 줄이세요</div>
+          <button class="cmd-btn" data-msg="앉아서 다리를 흔든 뒤 일어나세요" data-cat="edu">
+            <div class="cmd-btn-label">단계적 기립</div>
+            <div class="cmd-btn-sub">앉아서 다리를 흔든 뒤 일어나세요</div>
           </button>
-          <button class="cmd-btn" data-msg="매일 운동하세요" data-cat="edu">
-            <div class="cmd-btn-label">규칙적 운동</div>
-            <div class="cmd-btn-sub">매일 운동하세요</div>
+          <button class="cmd-btn" data-msg="까치발 들기를 하세요" data-cat="edu">
+            <div class="cmd-btn-label">하체 운동</div>
+            <div class="cmd-btn-sub">까치발 들기, 스쿼트</div>
           </button>
-          <button class="cmd-btn" data-msg="담배, 술 줄이세요" data-cat="edu">
-            <div class="cmd-btn-label">금연·절주</div>
-            <div class="cmd-btn-sub">담배, 술 줄이세요</div>
+          <button class="cmd-btn" data-msg="압박 스타킹을 신으세요" data-cat="edu">
+            <div class="cmd-btn-label">압박 스타킹</div>
+            <div class="cmd-btn-sub">아침에 일어나기 전 착용</div>
           </button>
-          <button class="cmd-btn" data-msg="다음에 또 오세요" data-cat="edu">
+          <button class="cmd-btn" data-msg="다리를 높게 올려주세요" data-cat="edu">
+            <div class="cmd-btn-label">다리 올리기</div>
+            <div class="cmd-btn-sub">어지러우면 누워서 다리를 높게</div>
+          </button>
+          <button class="cmd-btn" data-msg="어지러우면 바로 앉으세요" data-cat="edu">
+            <div class="cmd-btn-label">어지러울 때</div>
+            <div class="cmd-btn-sub">어지러우면 바로 앉으세요</div>
+          </button>
+          <button class="cmd-btn" data-msg="술과 뜨거운 샤워는 피하세요" data-cat="edu">
+            <div class="cmd-btn-label">악화 요인 피하기</div>
+            <div class="cmd-btn-sub">술과 뜨거운 샤워는 피하세요</div>
+          </button>
+          <button class="cmd-btn" data-msg="4주 후에 또 오세요" data-cat="edu">
             <div class="cmd-btn-label">다음 예약</div>
-            <div class="cmd-btn-sub">다음에 또 오세요</div>
+            <div class="cmd-btn-sub">4주 후에 또 오세요</div>
           </button>
         </div>
       </div>
@@ -696,7 +715,7 @@
     <span id="fbStatus">Firebase 연결 중...</span>
   </div>
   <div class="statusbar-divider"></div>
-  <div class="statusbar-item"><span>고혈압 외래 · 간호사실</span></div>
+  <div class="statusbar-item"><span>○○내과의원 · 간호처치실</span></div>
   <div class="statusbar-divider"></div>
   <div class="statusbar-item"><span id="roomLabel">—</span></div>
   <div class="statusbar-spacer"></div>
