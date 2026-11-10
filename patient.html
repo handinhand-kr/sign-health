@@ -891,7 +891,11 @@
   }
 
   // Teachable Machine Pose 모델
-  const MODEL_URL = 'https://teachablemachine.withgoogle.com/models/8xo4MdPwU/';
+  // 포즈 모델 여러 개를 함께 사용 (각 모델에 '없음' 클래스 필요)
+  const MODEL_URLS = [
+    'https://teachablemachine.withgoogle.com/models/VFnakb498/',   // 모델 1 (처음 학습한 모델)
+    'https://teachablemachine.withgoogle.com/models/Bcr5X8jxG/',   // 모델 2 (추가 단어)
+  ];
   const CONFIDENCE_THRESHOLD = 0.80;
   const CONFIRM_FRAMES = 15;
   const COOLDOWN_MS = 5000;
@@ -899,7 +903,8 @@
   const SILHOUETTE_MIN_SCORE = 0.5;   // 코·양 어깨가 이 신뢰도 이상일 때 '사람 감지됨'
 
   const videoEl = document.getElementById('camera');
-  let tmModel = null;
+  let tmModel = null;        // 관절 좌표 추출에 쓰는 기준 모델
+  let tmModels = [];         // 분류에 쓰는 모든 모델
   let gestureBuffer = [];
   let lastSentTime = 0;
 
@@ -923,12 +928,24 @@
     const recogText = document.getElementById('recogText');
     recogText.textContent = 'AI 모델 로딩 중...';
     try {
-      tmModel = await tmPose.load(MODEL_URL + 'model.json', MODEL_URL + 'metadata.json');
+      tmModels = await Promise.all(MODEL_URLS.map(u => tmPose.load(u + 'model.json', u + 'metadata.json')));
+      tmModel = tmModels[0];
       recogText.textContent = '인식 대기 중...';
       startCamera();
     } catch(e) {
       recogText.textContent = '모델 로드 실패: ' + e.message;
     }
+  }
+
+  // 여러 모델의 결과를 하나로 합침 (같은 이름이 있으면 더 높은 확률 사용)
+  function mergePredictions(results) {
+    const byName = new Map();
+    results.flat().forEach(p => {
+      const name = cleanClassName(p.className);
+      const prev = byName.get(name);
+      if (!prev || p.probability > prev.probability) byName.set(name, { className: p.className, probability: p.probability });
+    });
+    return [...byName.values()];
   }
 
   function updateRankList(predictions) {
@@ -969,14 +986,18 @@
     const recogText = document.getElementById('recogText');
     const recogProgress = document.getElementById('recogProgress');
 
+    // 관절 좌표는 한 번만 추출하고, 모든 모델에 같은 좌표를 넣어 분류
     const { pose, posenetOutput } = await tmModel.estimatePose(videoEl);
-    const predictions = await tmModel.predict(posenetOutput);
+    const results = await Promise.all(tmModels.map(m => m.predict(posenetOutput)));
+    const predictions = mergePredictions(results);
 
     // 실시간 순위 리스트 업데이트
     updateRankList(predictions);
 
-    // 가장 높은 confidence 클래스 찾기
-    let best = predictions.reduce((a, b) => a.probability > b.probability ? a : b);
+    // '없음'을 제외한 단어 중 가장 높은 확률 (없으면 '없음')
+    const words = predictions.filter(p => !IGNORE_CLASSES.has(cleanClassName(p.className)));
+    let best = words.length ? words.reduce((a, b) => a.probability > b.probability ? a : b)
+                            : { className: '없음', probability: 1 };
 
     // PoseNet은 사람이 없어도 관절 17개를 항상 돌려주므로, 관절별 신뢰도(score)로 실제 감지 여부를 판단
     const kp = (pose && pose.keypoints) || [];
