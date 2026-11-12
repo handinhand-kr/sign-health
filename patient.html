@@ -895,6 +895,7 @@
   const MODEL_URLS = [
     'https://teachablemachine.withgoogle.com/models/VFnakb498/',   // 모델 1 (처음 학습한 모델)
     'https://teachablemachine.withgoogle.com/models/Bcr5X8jxG/',   // 모델 2 (추가 단어)
+    'https://teachablemachine.withgoogle.com/models/ZSiHqdAkJi/',  // 모델 3 (추가 단어)
   ];
   const CONFIDENCE_THRESHOLD = 0.80;
   const CONFIRM_FRAMES = 15;
@@ -928,9 +929,14 @@
     const recogText = document.getElementById('recogText');
     recogText.textContent = 'AI 모델 로딩 중...';
     try {
-      tmModels = await Promise.all(MODEL_URLS.map(u => tmPose.load(u + 'model.json', u + 'metadata.json')));
+      // 주소가 잘못된 모델이 있어도 불러온 모델만으로 작동
+      const loaded = await Promise.allSettled(MODEL_URLS.map(u => tmPose.load(u + 'model.json', u + 'metadata.json')));
+      tmModels = loaded.filter(r => r.status === 'fulfilled').map(r => r.value);
+      const failed = MODEL_URLS.filter((u, i) => loaded[i].status === 'rejected');
+      if (failed.length) console.warn('불러오지 못한 모델:', failed);
+      if (!tmModels.length) throw new Error('불러온 모델이 없습니다');
       tmModel = tmModels[0];
-      recogText.textContent = '인식 대기 중...';
+      recogText.textContent = failed.length ? `인식 대기 중... (모델 ${failed.length}개 로드 실패)` : '인식 대기 중...';
       startCamera();
     } catch(e) {
       recogText.textContent = '모델 로드 실패: ' + e.message;
